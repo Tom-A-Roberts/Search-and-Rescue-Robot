@@ -20,11 +20,17 @@ def brighten_image(image: PIL.Image):
 	image = PIL.ImageEnhance.Brightness(image).enhance(1 + ((brightness_centre - brightness) * brighten_power))
 	return image
 
+has_started_processing = False
 
 def process_frame(_CLIP_AI, frame, text):
+	global has_started_processing
 	cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
 	_img = PIL.Image.fromarray(cv2image)
 	_img = brighten_image(_img)
+
+	if not has_started_processing:
+		has_started_processing = True
+		print("Started processing")
 
 	_vis, similarity_score = _CLIP_AI.find_CLIP_similarity([text], _img)
 	similarity_score = (similarity_score - 20) / 10
@@ -56,4 +62,3 @@ if __name__ == '__main__':
 		time.sleep(0.1)
 		if GUIObject.stopping.value == 1:
 			break
-		
